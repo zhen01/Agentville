@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import {createRoster} from './roster.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
-export function summarize(rows, name, updated, now = Date.now(), showText = process.env.AGENTVILLE_SHOW_TASK_TEXT==='1') {
+export function summarize(rows, name, updated, now = Date.now(), showText = false) {
   let project = name.replace(/\.jsonl$/, '').slice(-12), status = 'idle', started = updated;
   const events = [], files = new Set();let task=''; const clip=v=>typeof v==='string'?v.replace(/\s+/g,' ').trim().slice(0,240):'';
   for (const row of rows) {
@@ -18,7 +18,8 @@ export function summarize(rows, name, updated, now = Date.now(), showText = proc
     else if (['task_complete','turn_complete'].includes(t)) { status='done'; label='Finished a task'; }
     else if (['turn_aborted','task_aborted'].includes(t)) { status='idle'; label='Task interrupted'; }
     else if (['function_call','custom_tool_call'].includes(t)) { status='working';const name=typeof p.name==='string'&&/^[\w.-]{1,90}$/.test(p.name)?p.name:'tool';label=({'exec_command':'Ran a terminal command','apply_patch':'Edited project files','read_file':'Read a file','list_files':'Listed project files','web_search':'Searched the web'})[name]||`Used ${name}`; }
-    else if (t==='agent_message'&&showText&&p.message) {label=clip(p.message);}
+    else if (t==='message'&&p.role==='user'&&showText) {task=clip((p.content||[]).filter(x=>x.type==='input_text').map(x=>x.text).join(' '));}
+    else if (t==='agent_message') {label='Reported progress';}
     else if (['function_call_output','custom_tool_call_output'].includes(t)) { label='Received tool result'; }
     else if (['exec_approval_request','apply_patch_approval_request','approval_request'].includes(t)) { status='waiting'; label='Approval requested'; }
     else if (['agent_reasoning','reasoning'].includes(t)) { if(status!=='waiting') status='working'; label='Reasoning'; }
@@ -35,7 +36,7 @@ async function discover(dir, depth=0) {
   return [...entries.filter(e=>e.isFile()&&e.name.endsWith('.jsonl')).map(e=>join(dir,e.name)),...nested.flat()];
 }
 function parse(text) { return text.split('\n').flatMap(line=>{try{return [JSON.parse(line)]}catch{return []}}); }
-async function readSession(path, updated) {
+async function readSession(path, updated, showText = false) {
   const f=await open(path,'r');
   try {
     const {size}=await f.stat(); const cap=512*1024;
@@ -43,12 +44,12 @@ async function readSession(path, updated) {
     const tail=Buffer.alloc(Math.min(cap,size)); await f.read(tail,0,tail.length,Math.max(0,size-cap));
     const rows=parse(tail.toString('utf8'));
     if(size>cap) rows.unshift(...parse(head.toString('utf8')).filter(x=>x.type==='session_meta'));
-    return summarize(rows,basename(path),updated);
+    return summarize(rows,basename(path),updated,Date.now(),showText);
   } finally {await f.close();}
 }
-export async function sessions(dir=join(process.env.CODEX_HOME||join(homedir(),'.codex'),'sessions')) {
+export async function sessions(dir=join(process.env.CODEX_HOME||join(homedir(),'.codex'),'sessions'), showText=false) {
   const paths=await discover(dir); const entries=(await Promise.all(paths.map(async p=>({p,mtime:(await stat(p).catch(()=>null))?.mtimeMs||0})))).sort((a,b)=>b.mtime-a.mtime).slice(0,16);
-  return (await Promise.all(entries.map(e=>readSession(e.p,e.mtime).catch(()=>null)))).filter(Boolean);
+  return (await Promise.all(entries.map(e=>readSession(e.p,e.mtime,showText).catch(()=>null)))).filter(Boolean);
 }
 export function server() {
   const roster=createRoster(sessions);const scan=()=>roster.refresh().catch(()=>{});const timer=setInterval(scan,3000);timer.unref();
@@ -56,7 +57,7 @@ export function server() {
     const url=new URL(req.url,'http://localhost');
     res.setHeader('Cache-Control','no-store'); res.setHeader('X-Content-Type-Options','nosniff');
     if(req.method!=='GET') {res.writeHead(405);return res.end();}
-    if(url.pathname==='/api/sessions') {try{const rosterData=await roster.refresh();res.setHeader('Content-Type','application/json');return res.end(JSON.stringify({sessions:rosterData.active,history:rosterData.history,updated:Date.now()}));}catch{res.writeHead(500);return res.end('{}');}}
+    if(url.pathname==='/api/sessions') {try{const rosterData=await roster.refresh();res.setHeader('Content-Type','application/json');const reveal=url.searchParams.get('taskText')==='1';const textLogs=reveal?await sessions(undefined,true):[];const byId=new Map(textLogs.map(x=>[x.id,x.task]));const clean=x=>({...x,task:reveal?(byId.get(x.sessionId)||''):'',events:x.events.filter(e=>/^(Started a task|Finished a task|Task interrupted|Ran a terminal command|Edited project files|Read a file|Listed project files|Searched the web|Used [\w.-]{1,90}|Reported progress|Received tool result|Approval requested|Reasoning|Applied file changes)$/.test(e.label))});return res.end(JSON.stringify({sessions:rosterData.active.map(clean),history:rosterData.history.map(clean),updated:Date.now()}));}catch{res.writeHead(500);return res.end('{}');}}
     const asset={'/':'index.html','/style.css':'style.css','/app.js':'app.js','/company.js':'company.js','/workspace.js':'workspace.js'}[url.pathname];
     if(!asset){res.writeHead(404);return res.end('Not found');}
     res.setHeader('Content-Type',asset.endsWith('.html')?'text/html; charset=utf-8':asset.endsWith('.css')?'text/css':'text/javascript');

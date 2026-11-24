@@ -4,9 +4,9 @@
 
 Your AI workforce deserves more than a dozen terminal tabs. Agentville is a local-first visual headquarters for people running multiple Codex agents: organize projects into departments, staff workflows, and see who needs your attention.
 
-![Agentville product vision](docs/concept.jpg)
+![Agentville current interface preview](docs/current-interface.svg)
 
-*Design concept — the visual direction for Agentville, not a screenshot of the current MVP.*
+*Illustrated preview of the current Company HQ interface using the app’s actual workstation graphics and demo roles.*
 
 ## Meet your new company headquarters
 
@@ -37,7 +37,7 @@ Open **[http://localhost:4317](http://localhost:4317)**. Explore the sample comp
 3. Inspect their activity and check your CEO inbox.
 4. Review departed employees in Employee History.
 
-For optional task excerpts, start with `AGENTVILLE_SHOW_TASK_TEXT=1 npm start`. These excerpts may contain sensitive information and may be saved locally in history.
+Open **Settings → Show task text** to reveal task excerpts in Live mode. This is off by default and the preference is saved in your browser. Turning it off hides the excerpts again. Task text is fetched on demand from linked logs and is not added to new employee history records. Excerpts may contain sensitive information; avoid enabling them on shared screens.
 
 ## Built for the one-person company
 

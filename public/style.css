@@ -4,3 +4,5 @@
 .workspace-panel{border:1px solid #526052;border-radius:10px;padding:12px;margin-bottom:14px}.workspace-panel summary{cursor:pointer;color:#8ff3ad}.workspace-tabs{display:flex;flex-wrap:wrap;gap:4px}.workspace-tabs button{font-size:10px;padding:5px}.workspace-tabs .selected{background:#48664b;color:white}.doc-editor{width:100%;min-height:170px;background:#151917;color:#edf1e9;border:1px solid #526052;padding:8px;font:12px monospace;resize:vertical}.task-row{font-size:12px;padding:7px;border-bottom:1px solid #526052}.employee-workspace input{max-width:100%;margin-top:8px}.employee-workspace button{margin:3px 0}
 
 .employee-name{display:block;width:100%;background:#151917;color:#edf1e9;border:1px solid #526052;border-radius:6px;padding:9px;margin:8px 0;font:14px system-ui}.task-box>button{margin-right:6px;margin-top:4px}
+
+#settings{position:relative;margin-left:auto;color:var(--ink)}#settings summary{cursor:pointer;padding:9px;border:1px solid var(--line);border-radius:8px}#settings[open]{z-index:5}#settings label,#settings p{display:block;background:var(--panel);padding:10px;margin:0;max-width:250px}#settings p{font-size:11px;color:var(--muted)}
