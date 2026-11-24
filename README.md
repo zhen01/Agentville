@@ -2,7 +2,11 @@
 
 **One person. An entire company.**
 
-Your AI workforce deserves more than a dozen terminal tabs. Agentville is a local-first visual headquarters for people running multiple Codex agents: organize projects into departments, staff workflows, and see who needs your attention.
+## Why I built this
+
+Once I started using Codex for different projects, I realized that running more agents is much easier than keeping track of them. A few Terminal windows quickly become a context-switching problem: which agent is working on what, which one is waiting for me, and what happened to the work when a session ended?
+
+I thought it would be fun to represent those processes as a little company — with employees, departments, roles, and an office I could actually look at. Agentville is a visual headquarters for local Codex sessions, with a place to keep project context and see which agents need attention.
 
 ![Agentville current interface preview](docs/current-interface.svg)
 
