@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {loadCompany,staff} from '../public/company.js';
+test('live workspace starts clean and staffing moves employees between seats',()=>{const c=loadCompany({getItem:()=>null},'live');assert.equal(c.workflows.length,0);c.workflows=[{id:'w',roles:['A','B']}];let d=staff(c,'w',0,'e');d=staff(d,'w',1,'e');assert.deepEqual(d.assignments,{e:{workflow:'w',role:1}});d=staff(d,'w',1,'f');assert.deepEqual(d.assignments,{f:{workflow:'w',role:1}});d=staff(d,'w',1,'');assert.deepEqual(d.assignments,{});});
