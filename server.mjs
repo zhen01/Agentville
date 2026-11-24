@@ -57,7 +57,7 @@ export function server() {
     res.setHeader('Cache-Control','no-store'); res.setHeader('X-Content-Type-Options','nosniff');
     if(req.method!=='GET') {res.writeHead(405);return res.end();}
     if(url.pathname==='/api/sessions') {try{const rosterData=await roster.refresh();res.setHeader('Content-Type','application/json');return res.end(JSON.stringify({sessions:rosterData.active,history:rosterData.history,updated:Date.now()}));}catch{res.writeHead(500);return res.end('{}');}}
-    const asset={'/':'index.html','/style.css':'style.css','/app.js':'app.js','/company.js':'company.js'}[url.pathname];
+    const asset={'/':'index.html','/style.css':'style.css','/app.js':'app.js','/company.js':'company.js','/workspace.js':'workspace.js'}[url.pathname];
     if(!asset){res.writeHead(404);return res.end('Not found');}
     res.setHeader('Content-Type',asset.endsWith('.html')?'text/html; charset=utf-8':asset.endsWith('.css')?'text/css':'text/javascript');
     try{res.end(await readFile(join(root,'public',asset)));}catch{res.writeHead(500);res.end();}

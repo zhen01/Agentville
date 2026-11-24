@@ -43,7 +43,25 @@ For optional task excerpts, start with `AGENTVILLE_SHOW_TASK_TEXT=1 npm start`. 
 
 For developers, founders and independent builders working across concurrent agent sessions. The goal is to reduce context switching and make ownership, attention and progress visible.
 
-## What ships today — v0.3
+## What ships today — v0.4
+
+### Your founding team
+
+| Role | Responsibility |
+|---|---|
+| Researcher | Understand the customer and gather evidence |
+| Analyst | Turn evidence into decisions |
+| Engineer | Build the product |
+| Reviewer | Check quality and acceptance criteria |
+| Operations | Maintain delivery and operational documentation |
+
+### Employee workspace
+
+Open any employee's workspace to review or edit Tasks, Project, Agents, Decisions, Deliverables, Handoff and Lessons. Markdown checklists support `[ ]` (to do), `[~]` (in progress) and `[x]` (done). Documents are persisted in browser storage per workflow role; replacing a session does not erase that role's notes. Import existing Markdown files using the file picker and export saved documents to your project. These are manually maintained documents, not automatic filesystem synchronization.
+
+### Keep a shift alive
+
+Use tmux manually on macOS (`brew install tmux` if needed). Start a named session with `tmux new -s engineer`, then launch Codex normally inside it. Detach with Ctrl+B followed by D; return using `tmux attach -t engineer`. Closing a terminal does not stop a detached tmux session, but shutting down the Mac does. Agentville monitors detected processes without starting or stopping them. Before changing sessions, save a handoff and export the relevant documents to your project; review them with the next session.
 
 - Animated office and workflow rooms with configurable roles.
 - Live process detection, best-effort session-log linking and event inspection.

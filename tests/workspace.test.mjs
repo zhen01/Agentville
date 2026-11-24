@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {parseTasks,templates} from '../public/workspace.js';
+test('parse Markdown task status and generate persistent role documents',()=>{assert.deepEqual(parseTasks('- [ ] Plan\n- [~] Build\n- [x] Test').map(x=>x.state),['To do','In progress','Done']);assert.match(templates('Engineer','Ship product')['PROJECT.md'],/Ship product/);assert.equal(Object.keys(templates('Engineer','Ship')).length,7)});
